@@ -1,0 +1,22 @@
+<launch>
+  <arg name="text_file" default="1.txt" />  
+  <!-- Log data into rosbag-->
+  <node pkg="nmea_navsat_driver"
+        type="nmea_text_file_reader"
+        name="nmea_text_file_reader"
+        output="screen"
+        args=" src/nmea_navsat_driver/data/$(arg text_file)"/>
+  <node pkg="nmea_navsat_driver"
+        type="nmea_topic_driver"
+        name="nmea_topic_driver"
+        output="screen"/>
+  <node pkg="rosbag"
+        type="record"
+        name="boat_gps_bag"
+        args="-o  $(find nmea_navsat_driver)/logs/boat_bag
+              /fix
+              /vel
+              /heading
+              /magnetic_heading
+              /time_reference"/>
+</launch>
