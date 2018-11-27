@@ -198,38 +198,31 @@ class RosNMEADriver(object):
                     data['utc_time'])
                 self.time_ref_pub.publish(current_time_ref)
 
-        elif 'RMC' in parsed_sentence:
-            data = parsed_sentence['RMC']
-
+#        elif 'RMC' in parsed_sentence:
+#            data = parsed_sentence['RMC']
             # Only publish a fix from RMC if the use_RMC flag is set.
-            if self.use_RMC:
-                if data['fix_valid']:
-                    current_fix.status.status = NavSatStatus.STATUS_FIX
-                else:
-                    current_fix.status.status = NavSatStatus.STATUS_NO_FIX
-
-                current_fix.status.service = NavSatStatus.SERVICE_GPS
-
-                latitude = data['latitude']
-                if data['latitude_direction'] == 'S':
-                    latitude = -latitude
-                current_fix.latitude = latitude
-
-                longitude = data['longitude']
-                if data['longitude_direction'] == 'W':
-                    longitude = -longitude
-                current_fix.longitude = longitude
-
-                current_fix.altitude = float('NaN')
-                current_fix.position_covariance_type = \
-                    NavSatFix.COVARIANCE_TYPE_UNKNOWN
-
-                self.fix_pub.publish(current_fix)
-
-                if not math.isnan(data['utc_time']):
-                    current_time_ref.time_ref = rospy.Time.from_sec(
-                        data['utc_time'])
-                    self.time_ref_pub.publish(current_time_ref)
+#            if self.use_RMC:
+#                if data['fix_valid']:
+#                    current_fix.status.status = NavSatStatus.STATUS_FIX
+#                else:
+#                    current_fix.status.status = NavSatStatus.STATUS_NO_FIX
+#                current_fix.status.service = NavSatStatus.SERVICE_GPS
+#                latitude = data['latitude']
+#                if data['latitude_direction'] == 'S':
+#                    latitude = -latitude
+#                current_fix.latitude = latitude
+#                longitude = data['longitude']
+#                if data['longitude_direction'] == 'W':
+#                    longitude = -longitude
+#                current_fix.longitude = longitude
+#                current_fix.altitude = float('NaN')
+#                current_fix.position_covariance_type = \
+#                    NavSatFix.COVARIANCE_TYPE_UNKNOWN
+#                self.fix_pub.publish(current_fix)
+#                if not math.isnan(data['utc_time']):
+#                    current_time_ref.time_ref = rospy.Time.from_sec(
+#                        data['utc_time'])
+#                    self.time_ref_pub.publish(current_time_ref)
 
             # Publish velocity from RMC regardless, since GGA doesn't provide it.
             if data['fix_valid']:
