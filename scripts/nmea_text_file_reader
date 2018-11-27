@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+
+import rospy
+import os
+import sys
+import time
+from nmea_msgs.msg import Sentence
+from libnmea_navsat_driver.driver import RosNMEADriver
+
+
+def nmea_sentence_callback(nmea_sentence, driver):
+    driver.add_sentence(
+        nmea_sentence.sentence, frame_id=nmea_sentence.header.frame_id, timestamp=nmea_sentence.header.stamp)
+
+
+if __name__ == '__main__':
+    rospy.init_node('nmea_text_file_reader')
+    nmea_pub = rospy.Publisher("nmea_sentence", Sentence, queue_size=1)
+
+    # Get the frame_id
+    frame_id = RosNMEADriver.get_frame_id()
+
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        if '.ros' in os.getcwd():
+            filepath = os.path.expanduser('~') + '/catkin_ws/' + filename
+        else:
+            filepath = os.getcwd() + '/' + filename
+    else:
+        print("Please provide an input file")
+        sys.exit(1)
+
+    with open(filepath, 'r') as f:
+        line = f.readline().rstrip()
+        while line.strip() != '':
+            # print(line)
+            sentence = Sentence()
+            sentence.header.stamp = rospy.get_rostime()
+            sentence.header.frame_id = frame_id
+            sentence.sentence = line
+            nmea_pub.publish(sentence)
+            time.sleep(0.01)
+            line = f.readline().rstrip()
